@@ -4,7 +4,6 @@
   "description": "A node package helper to control your UPS PIco HV3.0A/B/B+ HAT",
   "main": "pimodule.js",
   "scripts": {
-    "test": "jest --verbose ./test",
     "check": "jest --verbose ./check"
   },
   "keywords": [
@@ -22,11 +21,5 @@
   "devDependencies": {
     "standard": "^12.0.1",
     "jest": "^24.9.0"
-  },
-  "standard": {
-    "globals": [
-      "test", 
-      "expect"
-    ]
   }
 }
