@@ -1,0 +1,8 @@
+- name: Setup UPS pimodule on your raspberry pi
+  hosts: all
+  become: yes
+  roles:
+    - role: setup
+      tags: setup
+    - role: pimodule
+      tags: pimodule
