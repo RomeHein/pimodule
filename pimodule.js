@@ -1,5 +1,4 @@
 const I2c = require('i2c-bus')
-const sleep = require('util').promisify(setTimeout)
 const EventEmitter = require('events')
 
 module.exports = class PiModuleHelper extends EventEmitter {
@@ -62,7 +61,7 @@ module.exports = class PiModuleHelper extends EventEmitter {
   async getPoweringMode () {
     let i2c1 = await I2c.openPromisified(1)
     const rbuf = Buffer.alloc(1)
-    const buffer = await i2c1.readI2cBlock(this.addresses[1], 0x00, rbuf.length, rbuf)
+    const { buffer } = await i2c1.readI2cBlock(this.addresses[1], 0x00, rbuf.length, rbuf)
     await i2c1.close()
     if (parseInt(buffer[0], 16) === 1) {
       return 'cable'
@@ -86,10 +85,10 @@ module.exports = class PiModuleHelper extends EventEmitter {
   async piModuleIsRunningProperly () {
     let i2c1 = await I2c.openPromisified(1)
     const buffer1 = await i2c1.readWord(this.addresses[1], 0x22)
-    await sleep(10)
+    await new Promise(resolve => setTimeout(resolve, 100))
     const buffer2 = await i2c1.readWord(this.addresses[1], 0x22)
     await i2c1.close()
-    return buffer1[0] !== buffer2[0]
+    return buffer1 !== buffer2
   }
 
   /**
