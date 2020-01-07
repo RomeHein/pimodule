@@ -6,6 +6,10 @@
   "scripts": {
     "check": "jest --verbose ./check"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RomeHein/pimodule"
+  },
   "keywords": [
     "pimodule",
     "raspberry",

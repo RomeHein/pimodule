@@ -21,7 +21,7 @@ Once you have fallowed the installations process, you'll be able to use:
 - Generate sounds
 - Get/set pimodule bistable relay state
 - Set leds (orange, green, blue)
-- Set events on keys (these name A, B and C)
+- Set events on keys (these named A, B and C)
 - Get/set pimodule fan mode (automatic, manual, disable)
 - Get pimodule fan state
 - Get/set pimodule fan speed
