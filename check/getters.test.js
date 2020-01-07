@@ -33,8 +33,8 @@ describe('Check getters', () => {
     const running = await piModule.fanIsRunning()
     expect(running).toBeDefined()
   })
-  test('get pi module fan mode', async () => {
-    const mode = await piModule.fanIsRunning()
+  test('get pi module fan speed', async () => {
+    const mode = await piModule.getFanSpeed()
     expect(mode).toBeDefined()
   })
 })
