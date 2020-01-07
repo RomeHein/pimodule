@@ -3,12 +3,13 @@
 A node package helper to control your UPS PIco HV3.0A/B/B+ HAT
 
 This library was not developped by the PiModule company.
-Any issue/query concerning their product won't find answers here, sorry :/
+Any query/issue concerning their product won't find answers here, sorry :/ Feel free to refer to their official github repo:
+https://github.com/modmypi/PiModules
 
 ## Getting Started
 
 The PiModule documentation can be a bit tricky to read. So here is a small helper of the most common features you may want to use.
-Once you have fallowed the installations process, you'll be able to use:
+Once you've followed the installation process, you'll be able to use:
 
 - Set pimodule addresses
 - Get pimodule temperature
@@ -17,7 +18,7 @@ Once you have fallowed the installations process, you'll be able to use:
 - Get/set pimodule powering mode (battery or power)
 - Set backed auxilary power
 - Get pimodule running state 
-- Set buzzer
+- Set buzzer state
 - Generate sounds
 - Get/set pimodule bistable relay state
 - Set leds (orange, green, blue)
@@ -58,10 +59,12 @@ Just install via npm:
 npm i pimodule --save
 ```
 
-Then import the module and start using it:
+### Usage
+
+Import the module and start using it:
 ```
     const PiModuleHelper = require('pimodule')
-    piModule = new PiModuleHelper()
+    const piModule = new PiModuleHelper()
 
     const state = await piModule.piModuleIsRunningProperly()
     console.log(`PiModule is running: ${state}`)
@@ -74,13 +77,16 @@ If you are using 'alternate', instantiate the module like so:
 
 ```
     const PiModuleHelper = require('pimodule')
-    piModule = new PiModuleHelper('alternate')
+    const piModule = new PiModuleHelper('alternate')
+
+    // Plays imperial starwars march from pimodule built in buzzer
+    await piModule.playSounds([[220, 700], [220, 700], [220, 700],[174, 525], [261, 175], [220, 700], [174, 525], [261, 175], [220, 1400]])
 ```
 
 
 ## Running the tests
 
-Tests seems a bit useless here as functions are very simple wrappers of the i2c-bus node library (which is heavily tested). 
+Tests seem a bit useless here as functions are very simple wrappers of the i2c-bus node library (which is heavily tested). 
 But I would make sure the library match the current implementation of the PiModule firmware before using pimodule.
 You can check that by running directly on the raspberry pi
 
