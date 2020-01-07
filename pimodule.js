@@ -27,6 +27,10 @@ module.exports = class PiModuleHelper extends EventEmitter {
    * Get piModule PCB temperature
    */
   async getPiModuleTemperature () {
+    let i2c1 = await I2c.openPromisified(1)
+    const byte = await i2c1.readByte(this.addresses[1], 0x00)
+    await i2c1.close()
+    return parseInt(byte, 16)
   }
 
   /**
@@ -46,12 +50,27 @@ module.exports = class PiModuleHelper extends EventEmitter {
    * Battery Voltage in 10th of mV in BCD format
    */
   async getBatteryLevel () {
+    let i2c1 = await I2c.openPromisified(1)
+    const byte = await i2c1.readByte(this.addresses[1], 0x08)
+    await i2c1.close()
+    return parseInt(byte, 16)
   }
 
   /**
    * Returns 'cable' if the raspberry is beeing powered by the cable, otherwise returns 'battery'
    */
   async getPoweringMode () {
+    let i2c1 = await I2c.openPromisified(1)
+    const rbuf = Buffer.alloc(1)
+    const buffer = await i2c1.readI2cBlock(this.addresses[1], 0x00, rbuf.length, rbuf)
+    await i2c1.close()
+    if (parseInt(buffer[0], 16) === 1) {
+      return 'cable'
+    } else if (parseInt(buffer[0], 16) === 2) {
+      return 'battery'
+    } else {
+      return 'unknown'
+    }
   }
 
   /**
@@ -65,6 +84,12 @@ module.exports = class PiModuleHelper extends EventEmitter {
    * Check if the piModule is running properly
    */
   async piModuleIsRunningProperly () {
+    let i2c1 = await I2c.openPromisified(1)
+    const buffer1 = await i2c1.readWord(this.addresses[1], 0x22)
+    await sleep(10)
+    const buffer2 = await i2c1.readWord(this.addresses[1], 0x22)
+    await i2c1.close()
+    return buffer1[0] !== buffer2[0]
   }
 
   /**
@@ -93,6 +118,10 @@ module.exports = class PiModuleHelper extends EventEmitter {
    * Get piModule relay state
    */
   async getBiStableRelayState () {
+    let i2c1 = await I2c.openPromisified(1)
+    const byte = await i2c1.readByte(this.addresses[3], 0x0c)
+    await i2c1.close()
+    return parseInt(byte, 16)
   }
 
   /**
@@ -123,6 +152,10 @@ module.exports = class PiModuleHelper extends EventEmitter {
    * Get fan mode: 0 is disabled, 1 is manual (read set fan speed), 2 is automatic
    */
   async getFanMode () {
+    let i2c1 = await I2c.openPromisified(1)
+    const byte = await i2c1.readByte(this.addresses[3], 0x11)
+    await i2c1.close()
+    return parseInt(byte, 16)
   }
 
   /**
@@ -133,12 +166,20 @@ module.exports = class PiModuleHelper extends EventEmitter {
   }
 
   async fanIsRunning () {
+    const i2c1 = await I2c.openPromisified(1)
+    const byte = await i2c1.readByte(this.addresses[3], 0x13)
+    await i2c1.close()
+    return parseInt(byte, 16)
   }
 
   /**
    * Get fan speed in %
    */
   async getFanSpeed () {
+    const i2c1 = await I2c.openPromisified(1)
+    const byte = await i2c1.readByte(this.addresses[3], 0x12)
+    await i2c1.close()
+    return parseInt(byte, 16)
   }
 
   /**
