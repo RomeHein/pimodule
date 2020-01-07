@@ -2,7 +2,7 @@
 const PiModuleHelper = require('../pimodule')
 const I2c = require('i2c-bus')
 
-describe('Check getters', () => {
+describe('Check setters', () => {
   const piModule = new PiModuleHelper()
 
   test('key pressed detection', async () => {

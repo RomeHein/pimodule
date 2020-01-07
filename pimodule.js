@@ -20,6 +20,16 @@ module.exports = class PiModuleHelper extends EventEmitter {
   * @param {String} toType 'alternate', 'noRtc' or 'default' can be used
   */
   static async setAddressType (fromType, toType) {
+    let i2c1 = await I2c.openPromisified(1)
+    const address = (fromType === 'alternate' ? 0x5B : 0x6B)
+    let command = 0xA0
+    if (toType === 'alternate') {
+      command = 0xA2
+    } else if (toType === 'noRtc') {
+      command = 0xA1
+    }
+    await i2c1.writeByte(address, 0x00, command)
+    await i2c1.close()
   }
 
   /**
@@ -37,12 +47,23 @@ module.exports = class PiModuleHelper extends EventEmitter {
    * @param {Integer} seconds Seconds before the raspberry pi is turned off. Maximum value 596 seconds
    */
   async setShutdownTimer (seconds) {
+    if (seconds <= 596) {
+      const i2c1 = await I2c.openPromisified(1)
+      const wbuf = Buffer.from([seconds.toString(16)])
+      await i2c1.writeI2cBlock(this.addresses[3], 0x05, wbuf.length, wbuf)
+      await i2c1.close()
+    } else {
+      throw new Error('Maximum shutdown timer value is 596 seconds')
+    }
   }
 
   /**
    * Stop the shutdown timer (named STA or still alive functionnality)
    */
   async stopShutdownTimer () {
+    const i2c1 = await I2c.openPromisified(1)
+    await i2c1.writeByte(this.addresses[3], 0x05, 0xff)
+    await i2c1.close()
   }
 
   /**
@@ -77,6 +98,9 @@ module.exports = class PiModuleHelper extends EventEmitter {
    * @param {Boolen} on true if auxilary 5v and 3.3v need to be backed on piModule battery
    */
   async setBackedAuxilaryPower (on) {
+    const i2c1 = await I2c.openPromisified(1)
+    await i2c1.writeByte(this.addresses[3], 0x06, on ? 0x01 : 0x00)
+    await i2c1.close()
   }
 
   /**
@@ -96,6 +120,9 @@ module.exports = class PiModuleHelper extends EventEmitter {
    * @param {Boolean} on true to enable the built in buzzer of the pimodule
    */
   async switchBuzzer (on) {
+    const i2c1 = await I2c.openPromisified(1)
+    await i2c1.writeByte(this.addresses[3], 0x0D, on ? 0x01 : 0x00)
+    await i2c1.close()
   }
 
   /**
@@ -104,6 +131,14 @@ module.exports = class PiModuleHelper extends EventEmitter {
     * @param {Integer} frequency Sound's frequency in Hz
     **/
   async generateNote (frequency, duration) {
+    if (duration <= 2550) {
+      const i2c1 = await I2c.openPromisified(1)
+      await i2c1.writeWord(this.addresses[3], 0x0e, frequency)
+      await i2c1.writeByte(this.addresses[3], 0x10, Math.floor(duration / 10))
+      await i2c1.close()
+    } else {
+      throw new Error('Maximum note duration is 2550ms')
+    }
   }
 
   /**
@@ -111,6 +146,17 @@ module.exports = class PiModuleHelper extends EventEmitter {
    * @param {Array} sounds Array of array like this: [[sound1frequency, sound1Duration], [0, silenceDuration] ,[sound2frequency, sound2Duration], ...]
    */
   async playSounds (sounds) {
+    if (sounds && sounds.constructor === Array) {
+      for (const sound of sounds) {
+        if (sound.constructor === Array && sound.length === 2) {
+          if (sound[0]) {
+            await this.generateNote(sound[0], sound[1])
+          }
+          // Add an extra 50ms to give some space between each note
+          await new Promise(resolve => setTimeout(resolve, sound[1] + 50))
+        }
+      }
+    }
   }
 
   /**
@@ -128,6 +174,9 @@ module.exports = class PiModuleHelper extends EventEmitter {
    * @param {Boolean} on true to turn on the relay
    */
   async switchBiStableRelay (on) {
+    const i2c1 = await I2c.openPromisified(1)
+    await i2c1.writeByte(this.addresses[3], 0x0c, on ? 0x01 : 0x00)
+    await i2c1.close()
   }
 
   /**
@@ -136,6 +185,15 @@ module.exports = class PiModuleHelper extends EventEmitter {
    * @param {Bool} on Turn on or off the led
    */
   async switchLed (color, on) {
+    const i2c1 = await I2c.openPromisified(1)
+    let command = 0x09 // default orange
+    if (color === 'green') {
+      command = 0x0A
+    } else if (color === 'blue') {
+      command = 0x0b
+    }
+    await i2c1.writeByte(this.addresses[3], command, on ? 0x01 : 0x00)
+    await i2c1.close()
   }
 
   /**
@@ -184,6 +242,13 @@ module.exports = class PiModuleHelper extends EventEmitter {
    * @param {Integer} mode 0 to disable fan, 1 to set manual speed, 2 to set automatic speed
    */
   async setFanMode (mode) {
+    if (mode <= 2) {
+      const i2c1 = await I2c.openPromisified(1)
+      await i2c1.writeByte(this.addresses[3], 0x11, mode.toString(16))
+      await i2c1.close()
+    } else {
+      throw new Error('Forbidden mode. O to 2 allowed')
+    }
   }
 
   async fanIsRunning () {
@@ -208,6 +273,13 @@ module.exports = class PiModuleHelper extends EventEmitter {
    * @param {Integer} speed 0 to 100 in %
    */
   async setFanSpeed (speed) {
+    if (speed <= 100) {
+      const i2c1 = await I2c.openPromisified(1)
+      await i2c1.writeByte(this.addresses[3], 0x11, speed.toString(16))
+      await i2c1.close()
+    } else {
+      throw new Error('Forbidden speed. O to 100 allowed')
+    }
   }
 
   /**
@@ -215,5 +287,12 @@ module.exports = class PiModuleHelper extends EventEmitter {
    * @param {Integer} temperature 0 to 60 degree Celsius
    */
   async setFanTemperatureTreshold (temperature) {
+    if (temperature <= 60) {
+      const i2c1 = await I2c.openPromisified(1)
+      await i2c1.writeByte(this.addresses[3], 0x14, temperature.toString(16))
+      await i2c1.close()
+    } else {
+      throw new Error('Forbidden temperature. O to 60 Celsius allowed')
+    }
   }
 }
