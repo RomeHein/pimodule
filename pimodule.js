@@ -26,7 +26,7 @@ module.exports = class PiModuleHelper extends EventEmitter {
    * Get piModule PCB temperature
    */
   async getPiModuleTemperature () {
-    let i2c1 = await I2c.openPromisified(1)
+    const i2c1 = await I2c.openPromisified(1)
     const byte = await i2c1.readByte(this.addresses[1], 0x00)
     await i2c1.close()
     return parseInt(byte, 16)
@@ -49,7 +49,7 @@ module.exports = class PiModuleHelper extends EventEmitter {
    * Battery Voltage in 10th of mV in BCD format
    */
   async getBatteryLevel () {
-    let i2c1 = await I2c.openPromisified(1)
+    const i2c1 = await I2c.openPromisified(1)
     const byte = await i2c1.readByte(this.addresses[1], 0x08)
     await i2c1.close()
     return parseInt(byte, 16)
@@ -59,7 +59,7 @@ module.exports = class PiModuleHelper extends EventEmitter {
    * Returns 'cable' if the raspberry is beeing powered by the cable, otherwise returns 'battery'
    */
   async getPoweringMode () {
-    let i2c1 = await I2c.openPromisified(1)
+    const i2c1 = await I2c.openPromisified(1)
     const rbuf = Buffer.alloc(1)
     const { buffer } = await i2c1.readI2cBlock(this.addresses[1], 0x00, rbuf.length, rbuf)
     await i2c1.close()
@@ -83,7 +83,7 @@ module.exports = class PiModuleHelper extends EventEmitter {
    * Check if the piModule is running properly
    */
   async piModuleIsRunningProperly () {
-    let i2c1 = await I2c.openPromisified(1)
+    const i2c1 = await I2c.openPromisified(1)
     const buffer1 = await i2c1.readWord(this.addresses[1], 0x22)
     await new Promise(resolve => setTimeout(resolve, 100))
     const buffer2 = await i2c1.readWord(this.addresses[1], 0x22)
@@ -117,7 +117,7 @@ module.exports = class PiModuleHelper extends EventEmitter {
    * Get piModule relay state
    */
   async getBiStableRelayState () {
-    let i2c1 = await I2c.openPromisified(1)
+    const i2c1 = await I2c.openPromisified(1)
     const byte = await i2c1.readByte(this.addresses[3], 0x0c)
     await i2c1.close()
     return parseInt(byte, 16)
@@ -145,13 +145,35 @@ module.exports = class PiModuleHelper extends EventEmitter {
    * @param {Integer} timeInterval time between each check in ms.
    */
   async setKeyPressedDetection (timeInterval) {
+    if (timeInterval) {
+      this.keyPressedDetectionTimer = setInterval(async () => {
+        const i2c1 = await I2c.openPromisified(1)
+        const byte = await i2c1.readByte(this.addresses[1], 0x1a)
+        let key = parseInt(byte, 16)
+        if (key) {
+          if (key === 1) {
+            this.emit('a-key-triggered')
+          } else if (key === 2) {
+            this.emit('b-key-triggered')
+          } else if (key === 3) {
+            this.emit('c-key-triggered')
+          }
+          // Write 0 so that we can detect another key event
+          await i2c1.writeByte(this.addresses[1], 0x1a, 0x00)
+        }
+        await i2c1.close()
+      }, timeInterval)
+    } else {
+      clearInterval(this.keyPressedDetectionTimer)
+      this.keyPressedDetectionTimer = null
+    }
   }
 
   /**
    * Get fan mode: 0 is disabled, 1 is manual (read set fan speed), 2 is automatic
    */
   async getFanMode () {
-    let i2c1 = await I2c.openPromisified(1)
+    const i2c1 = await I2c.openPromisified(1)
     const byte = await i2c1.readByte(this.addresses[3], 0x11)
     await i2c1.close()
     return parseInt(byte, 16)
