@@ -1,6 +1,6 @@
 {
   "name": "pimodule",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A node package helper to control your UPS PIco HV3.0A/B/B+ HAT",
   "main": "pimodule.js",
   "scripts": {
