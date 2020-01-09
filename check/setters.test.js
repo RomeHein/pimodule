@@ -13,7 +13,7 @@ describe('Check setters', () => {
 
     // Simulate key stroke on A button
     const i2c1 = await I2c.openPromisified(1)
-    await i2c1.writeByte(piModule.addresses[1], 0x1a, 0x01)
+    await i2c1.writeByte(...piModule.commands.keys, 0x01)
     await i2c1.close()
     await new Promise(resolve => setTimeout(resolve, 100))
 

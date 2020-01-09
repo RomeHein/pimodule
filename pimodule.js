@@ -17,8 +17,8 @@ module.exports = class PiModuleHelper extends EventEmitter {
       poweringMode: [this.addresses[1], 0x00],
       batteryLevel: [this.addresses[1], 0x08],
       temperature: [this.addresses[1], 0x1b],
-      pimoduleRunning: [this.addresses[1], 0x1a],
-      keys: [this.addresses[1], 0x1b],
+      pimoduleRunning: [this.addresses[1], 0x22],
+      keys: [this.addresses[1], 0x1a],
       shutdownTimer: [this.addresses[3], 0x05],
       auxilaryPower: [this.addresses[3], 0x06],
       buzzer: [this.addresses[3], 0x0d],
@@ -208,9 +208,9 @@ module.exports = class PiModuleHelper extends EventEmitter {
    */
   async piModuleIsRunningProperly () {
     const i2c1 = await I2c.openPromisified(1)
-    const buffer1 = await i2c1.readWord(...this.commands.pimodulerunning)
+    const buffer1 = await i2c1.readWord(...this.commands.pimoduleRunning)
     await new Promise(resolve => setTimeout(resolve, 100))
-    const buffer2 = await i2c1.readWord(...this.commands.pimodulerunning)
+    const buffer2 = await i2c1.readWord(...this.commands.pimoduleRunning)
     await i2c1.close()
     return buffer1 !== buffer2
   }
