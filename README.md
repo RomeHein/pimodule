@@ -2,9 +2,11 @@
 
 A node package helper to control your UPS PIco HV3.0A/B/B+ HAT
 
-This library was not developped by the PiModule company.
+This library was not developped by the PiModules(R) UPSPIco company.
 Any query/issue concerning their product won't find answers here, sorry :/ Feel free to refer to their official github repo:
 https://github.com/modmypi/PiModules
+
+Be aware that this package uses exclusively await/async, no callbacks ;)
 
 ## Getting Started
 
@@ -34,22 +36,40 @@ Once you've followed the installation process, you'll be able to use:
 You'll need a UPS PIco HV3.0A/B/B+ HAT, you can order it here:
 https://pimodules.com/plus-advanced
 
-You'll also need to get the installation process right. Which can be tricky as the official documentation gives multiple ways to do it.
-My approach is to make it easy to reproduce via Ansible, in case your rasperry pi fails.
-To use the playbook provided, just clone this repository:
+You'll also need to get the installation process right.
+Two ways:
+
+- Ansible
+Make it easy to reproduce via Ansible, in case your rasperry pi fails.
+To use the playbook provided, just clone this repository on your dev machine:
 
 ```
 git clone https://github.com/RomeHein/pimodule.git
 ```
 
-You'll need at least ansible installed on your dev machine.
+You'll need at least ansible installed.
 Make sure to change the local address of your raspberry pi aswell as the correct user in the following command:
 ```
 cd /ansible
 ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook pimodule.yml -i raspberrypi.local, --user=pi --ask-pass
 ```
 
-If you don't want to use ansible, just have a look to the commands in /ansible/roles/pimodule/tasks/main.yml, they should get you up and running.
+- Script: installer.sh
+
+Just copy past the script `installer.sh` on your raspberry pi. 
+Make sure you have the right permissions to run the script:
+```
+    chmod +x installer.sh
+```
+And run it with sudo:
+```
+sudo ./installer.sh
+```
+
+Alternatively, you can run it via npm once the repo cloned on your raspberry pi:
+``` 
+sudo npm run installer
+```
 
 ### Installing
 
