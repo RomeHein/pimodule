@@ -64,7 +64,7 @@ module.exports = class PiModuleHelper extends EventEmitter {
       const i2c1 = await I2c.openPromisified(1)
       const byte = await i2c1.readByte(...this.commands[hardware])
       await i2c1.close()
-      return parseInt(byte, 16)
+      return byte
     }
     throw new Error(hardware + `is not a known 'getable' hardware`)
   }
