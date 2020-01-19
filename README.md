@@ -11,24 +11,24 @@ Be aware that this package uses exclusively await/async, no callbacks ;)
 ## Getting Started
 
 The PiModule documentation can be a bit tricky to read. So here is a small helper of the most common features you may want to use.
-Once you've followed the installation process, you'll be able to use:
+Once you've followed the installation process, you'll be able to use the following functions:
 
 - Set pimodule addresses
 - Get pimodule temperature
 - Set shutdown timer
 - Get pimodule battery level
 - Get/set pimodule powering mode (battery or power)
-- Set backed auxilary power
+- Set backed auxiliary power
 - Get pimodule running state 
 - Set buzzer state
 - Generate sounds
 - Get/set pimodule bistable relay state
 - Set leds (orange, green, blue)
-- Set events on keys (these named A, B and C)
-- Get/set pimodule fan mode (automatic, manual, disable)
+- Set events on keys (named A, B and C)
+- Get/set pimodule fan mode (automatic, manual, disabled)
 - Get pimodule fan state
 - Get/set pimodule fan speed
-- Set temperature treshold
+- Set temperature threshold
 
 
 ### Prerequisites
@@ -37,10 +37,11 @@ You'll need a UPS PIco HV3.0A/B/B+ HAT, you can order it here:
 https://pimodules.com/plus-advanced
 
 You'll also need to get the installation process right.
-Two ways:
+You can choose one of two ways:
 
 - Ansible
-Make it easy to reproduce via Ansible, in case your rasperry pi fails.
+
+Make it easy to reproduce via Ansible in case your rasperry pi fails! 
 To use the playbook provided, just clone this repository on your dev machine:
 
 ```
@@ -48,7 +49,7 @@ git clone https://github.com/RomeHein/pimodule.git
 ```
 
 You'll need at least ansible installed.
-Make sure to change the local address of your raspberry pi aswell as the correct user in the following command:
+Make sure to change the local address of your raspberry pi as well as the correct user in the following command:
 ```
 cd /ansible
 ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook pimodule.yml -i raspberrypi.local, --user=pi --ask-pass
@@ -66,7 +67,7 @@ And run it with sudo:
 sudo ./installer.sh
 ```
 
-Alternatively, you can run it via npm once the repo cloned on your raspberry pi:
+Alternatively, you can run it via npm once the repo is cloned on your raspberry pi:
 ``` 
 sudo npm run installer
 ```
@@ -107,8 +108,8 @@ If you are using 'alternate', instantiate the module like so:
 ## Running the tests
 
 Tests seem a bit useless here as functions are very simple wrappers of the i2c-bus node library (which is heavily tested). 
-But I would make sure the library match the current implementation of the PiModule firmware before using pimodule.
-You can check that by running directly on the raspberry pi
+However I would make sure the library matches the current implementation of the PiModule firmware before using pimodule.
+You can check that by running directly on the raspberry pi:
 
 ```
 npm run check
@@ -119,7 +120,7 @@ This will run tests without mocking the i2c-bus library. That way we are sure ad
 
 ## Contributing
 
-All pull requests/suggestions are welcome
+All pull requests/suggestions are welcome.
 
 ## Authors
 
