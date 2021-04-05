@@ -1,0 +1,76 @@
+# Original project: https://github.com/RomeHein/pimodule
+# MIT license
+# See instructions at github repo.
+# This instruction was added to configure the real-time clock of the UPS PIco
+# This should be executed after the basic setup (pimodule-setup) and is optional.
+
+---
+- name: Configure /etc/modules for UPS PIco HV3.0 Hardware RTC
+  become: yes
+  lineinfile:
+    path: /etc/modules
+    line: "{{ item.line }}"
+  with_items:
+    - { line: 'i2c-bcm2708' }
+    - { line: 'i2c-dev' }
+    - { line: 'rtc-ds1307' }
+  notify: Reboot host and wait for it to restart
+
+- name: Configure /boot/config.txt for UPS PIco HV3.0 Hardware RTC
+  become: yes
+  lineinfile:
+    path: /boot/config.txt
+    line: "{{ item.line }}"
+  with_items:
+    - { line: 'enable_uart=1' }
+    - { line: 'dtoverlay=i2c-rtc,ds1307' }
+  notify: Reboot host and wait for it to restart
+
+- name: Configure /etc/rc.local for UPS PIco HV3.0 Hardware RTC
+  become: yes
+  lineinfile:
+    path: /etc/rc.local
+    insertbefore: "exit 0"
+    line: "sleep 4; hwclock -s &"
+  notify: Reboot host and wait for it to restart
+
+- name: Reboot now if any of the configuration files have changed
+  meta: flush_handlers
+
+- name: Remove the fake-hwclock which interferes with the UPS PIco RTC hwclock
+  become: yes
+  apt:
+    name: fake-hwclock
+    state: absent
+
+- name: Remove fake-hwclock from update-rc.d
+  become: yes
+  command:
+    cmd: update-rc.d -f fake-hwclock remove
+
+- name: Comment out lines in /lib/udev/hwclock-set
+  become: yes
+  replace:
+    path: /lib/udev/hwclock-set
+    regexp: '(^if \[ -e \/run\/systemd\/system ] ; then[\s\S]*?)fi'
+#    replace: 'tada'
+    replace: |-
+      #if [ -e /run/systemd/system ] ; then
+      #   exit 0
+      #fi
+
+- name: Retrieving current date and time of your device (make sure it is up to date)
+  command: date
+  register: date
+
+- debug: msg="It is now {{ date.stdout }}"
+
+- name: Setting the RTC with date/time above
+  become: yes
+  command: hwclock -w
+
+- name: Reading the RTC
+  command: hwclock -r
+  register: date
+
+- debug: msg="This is the date of the RTC {{ date.stdout }}. On next boot the time of your device will be synced with the RTC."
