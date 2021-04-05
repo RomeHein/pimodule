@@ -1,2 +1,0 @@
----
-pimodule_helper_path: /home/{{ ansible_ssh_user}}/pimodule-helper
