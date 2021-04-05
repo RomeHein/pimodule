@@ -1,0 +1,14 @@
+# Original project: https://github.com/RomeHein/pimodule
+# MIT license
+# See instructions at github repo.
+# First make sure the PiModule is configured (pimodule_presetup and pimodule_setup)
+#
+# This task clones the repo on the destination device. See repo above on how to
+# validate that the helper is actually working
+
+---
+- name: Download the node package helper to control your UPS PIco HV3.0A/B/B+ HAT
+  git: repo=https://github.com/RomeHein/pimodule dest={{ pimodule_helper_path }} clone=yes force=yes
+  become: no
+- name: Install i2c serial bus access library (i2c-bus) for Node.js
+  npm: name=i2c-bus state=latest path={{ pimodule_helper_path }}

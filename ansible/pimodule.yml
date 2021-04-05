@@ -6,3 +6,9 @@
       tags: setup
     - role: pimodule
       tags: pimodule
+# Optionally setup the RTC of the UPS PIco HAT
+#    - role: pimodule-setup-rtc
+#      tags: pimodule-setup-rtc
+
+# Optionally install the node helper by cloning the repo
+#    - role: pimodule-node-helper
